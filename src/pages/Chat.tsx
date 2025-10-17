@@ -47,8 +47,10 @@ const Chat = () => {
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
               </Button>
-              <Button variant="ghost" size="icon">
-                <Settings className="h-5 w-5" />
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/settings">
+                  <Settings className="h-5 w-5" />
+                </Link>
               </Button>
               <Avatar>
                 <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>

@@ -62,7 +62,7 @@ const Signup = () => {
             </div>
 
             <Button variant="hero" className="w-full" size="lg" asChild>
-              <Link to="/dashboard">Create Team</Link>
+              <Link to="/onboarding">Create Team</Link>
             </Button>
           </form>
 

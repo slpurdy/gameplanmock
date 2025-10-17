@@ -69,8 +69,10 @@ const Calendar = () => {
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
               </Button>
-              <Button variant="ghost" size="icon">
-                <Settings className="h-5 w-5" />
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/settings">
+                  <Settings className="h-5 w-5" />
+                </Link>
               </Button>
               <Avatar>
                 <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
@@ -87,9 +89,11 @@ const Calendar = () => {
             <h1 className="text-3xl md:text-4xl font-bold mb-2">Team Calendar</h1>
             <p className="text-muted-foreground">Manage events and track attendance</p>
           </div>
-          <Button variant="hero" size="lg">
-            <Plus className="h-5 w-5 mr-2" />
-            Create Event
+          <Button variant="hero" size="lg" asChild>
+            <Link to="/calendar/create">
+              <Plus className="h-5 w-5 mr-2" />
+              Create Event
+            </Link>
           </Button>
         </div>
 
