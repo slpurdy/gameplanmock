@@ -1,11 +1,53 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { Trophy, Mail, CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const Signup = () => {
+  const { signUp, signInWithGoogle } = useAuth();
+  const { toast } = useToast();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const fullName = `${firstName} ${lastName}`.trim();
+    const { error } = await signUp(email, password, fullName);
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Signup failed",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Account created!",
+        description: "You can now join or create a team.",
+      });
+    }
+    setLoading(false);
+  };
+
+  const handleGoogleSignup = async () => {
+    const { error } = await signInWithGoogle();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Signup failed",
+        description: error.message,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent/10 via-background to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-5xl grid md:grid-cols-2 gap-8 items-center">
@@ -20,15 +62,27 @@ const Signup = () => {
             <p className="text-muted-foreground">Start organizing in minutes</p>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" placeholder="John" required />
+                <Input 
+                  id="firstName" 
+                  placeholder="John" 
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" placeholder="Doe" required />
+                <Input 
+                  id="lastName" 
+                  placeholder="Doe" 
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required 
+                />
               </div>
             </div>
 
@@ -38,15 +92,8 @@ const Signup = () => {
                 id="email" 
                 type="email" 
                 placeholder="you@example.com" 
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="teamName">Team Name</Label>
-              <Input 
-                id="teamName" 
-                placeholder="Thunder Cycling Club" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -57,12 +104,14 @@ const Signup = () => {
                 id="password" 
                 type="password" 
                 placeholder="••••••••" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
 
-            <Button variant="hero" className="w-full" size="lg" asChild>
-              <Link to="/onboarding">Create Team</Link>
+            <Button variant="hero" className="w-full" size="lg" type="submit" disabled={loading}>
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
@@ -76,7 +125,7 @@ const Signup = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignup} type="button">
               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -98,7 +147,7 @@ const Signup = () => {
               <span className="ml-2">Google</span>
             </Button>
             
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" disabled>
               <Mail className="h-5 w-5" />
               <span className="ml-2">Email Link</span>
             </Button>
