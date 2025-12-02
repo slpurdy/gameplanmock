@@ -67,6 +67,17 @@ const Chat = () => {
 
   const [activeChannel, setActiveChannel] = useState<Channel>(channels[0]);
 
+  const [missedSummary] = useState({
+    messageCount: 23,
+    highlights: [
+      "Practice moved to Saturday 8am",
+      "New team uniforms arriving next week",
+      "Jenny volunteered for water duty",
+      "Coach posted training schedule",
+    ],
+    mentionCount: 2,
+  });
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -149,6 +160,7 @@ const Chat = () => {
 
   const pinnedMessages = messages.filter((m) => m.isPinned);
   const onlineCount = members.filter((m) => m.status === "online").length;
+  const totalUnread = channels.reduce((sum, c) => sum + c.unread, 0);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -286,6 +298,8 @@ const Chat = () => {
           onDMSelect={handleDMSelect}
           onCreateChannel={handleCreateChannel}
           teamName="GamePlan Team"
+          totalUnread={totalUnread}
+          missedSummary={missedSummary}
         />
       </div>
 
