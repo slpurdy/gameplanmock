@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Link, useNavigate } from "react-router-dom";
-import { Trophy, Bell, Settings as SettingsIcon, Calendar, ArrowLeft, Save } from "lucide-react";
+import BackButton from "@/components/BackButton";
+import { Trophy, Bell, Settings as SettingsIcon, Calendar, Save } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,10 +93,13 @@ const CreateEvent = () => {
       <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">GamePlan</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <BackButton />
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <Trophy className="h-8 w-8 text-primary" />
+                <span className="text-2xl font-bold">GamePlan</span>
+              </Link>
+            </div>
 
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="relative">
@@ -116,11 +120,6 @@ const CreateEvent = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-3xl">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-
         <h1 className="text-3xl md:text-4xl font-bold mb-8">Create New Event</h1>
 
         <Card className="p-6">

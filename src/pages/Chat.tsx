@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import ChatSidebar from "@/components/chat/ChatSidebar";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatMessage, { Message } from "@/components/chat/ChatMessage";
@@ -266,15 +267,17 @@ const Chat = () => {
 
   return (
     <div className="h-screen flex bg-background">
-      {/* Mobile Sidebar Toggle */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-3 left-3 z-50 md:hidden"
-        onClick={() => setShowSidebar(!showSidebar)}
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
+      {/* Mobile Navigation */}
+      <div className="fixed top-3 left-3 z-50 md:hidden flex items-center gap-1">
+        <BackButton className="h-9 w-9" />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
 
       {/* Sidebar Overlay for Mobile */}
       {showSidebar && (
