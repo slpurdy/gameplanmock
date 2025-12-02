@@ -8,11 +8,13 @@ import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Trophy, Bell, Settings as SettingsIcon, Save, Upload, Shield, CreditCard, Users, Trash2
+  Trophy, Settings as SettingsIcon, Save, Upload, Shield, CreditCard, Users, Trash2
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 
 const Settings = () => {
   const { toast } = useToast();
@@ -46,12 +48,9 @@ const Settings = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative" onClick={() => handleAction("Notifications")}>
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
-              </Button>
-              <Avatar>
-                <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
+              <NotificationCenter />
+              <Avatar className="neon-border">
+                <AvatarFallback className="bg-primary text-primary-foreground font-display">JD</AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -189,8 +188,10 @@ const Settings = () => {
 
           {/* Notifications */}
           <TabsContent value="notifications" className="space-y-6">
-            <Card className="p-6">
-              <h2 className="text-2xl font-bold mb-6">Notification Preferences</h2>
+            <NotificationSettings />
+            
+            <Card className="p-6 neon-border">
+              <h2 className="text-2xl font-bold mb-6 font-display uppercase tracking-wider">In-App Notifications</h2>
               
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
@@ -203,7 +204,7 @@ const Settings = () => {
                   <Switch defaultChecked />
                 </div>
 
-                <Separator />
+                <Separator className="bg-border/50" />
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
@@ -215,7 +216,7 @@ const Settings = () => {
                   <Switch defaultChecked />
                 </div>
 
-                <Separator />
+                <Separator className="bg-border/50" />
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
@@ -227,7 +228,7 @@ const Settings = () => {
                   <Switch defaultChecked />
                 </div>
 
-                <Separator />
+                <Separator className="bg-border/50" />
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
@@ -239,7 +240,7 @@ const Settings = () => {
                   <Switch defaultChecked />
                 </div>
 
-                <Separator />
+                <Separator className="bg-border/50" />
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
@@ -251,7 +252,7 @@ const Settings = () => {
                   <Switch />
                 </div>
 
-                <Button variant="hero" onClick={() => handleSave("notification")}>
+                <Button variant="hero" onClick={() => handleSave("notification")} className="btn-hero">
                   <Save className="h-4 w-4 mr-2" />
                   Save Preferences
                 </Button>
