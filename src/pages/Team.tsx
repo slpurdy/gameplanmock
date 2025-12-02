@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { 
   Trophy,
@@ -15,13 +14,25 @@ import {
   Edit,
   Instagram,
   Facebook,
-  Twitter
+  Twitter,
+  UserCog,
+  Calendar,
+  MessageSquare,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import teamIcon from "@/assets/team-icon.png";
+import TeamSwitcher from "@/components/TeamSwitcher";
 
 const Team = () => {
+  const { toast } = useToast();
+  
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copied!", description: `${label} copied to clipboard.` });
+  };
+
   const teamMembers = [
     { name: "Coach Alex", role: "Coach", status: "online", initials: "CA" },
     { name: "Sarah Martinez", role: "Captain", status: "online", initials: "SM" },
@@ -37,10 +48,13 @@ const Team = () => {
       <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">GamePlan</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <Trophy className="h-8 w-8 text-primary" />
+                <span className="text-2xl font-bold hidden sm:inline">GamePlan</span>
+              </Link>
+              <TeamSwitcher />
+            </div>
 
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="relative">
@@ -90,11 +104,13 @@ const Team = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="hero">
-                      <Mail className="h-4 w-4 mr-2" />
-                      Join Team
+                    <Button variant="hero" asChild>
+                      <Link to="/invite-members">
+                        <Mail className="h-4 w-4 mr-2" />
+                        Invite Members
+                      </Link>
                     </Button>
-                    <Button variant="outline" size="icon">
+                    <Button variant="outline" size="icon" onClick={() => copyToClipboard(window.location.href, "Team page link")}>
                       <Share2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -130,6 +146,34 @@ const Team = () => {
                 </Card>
               </div>
 
+              {/* Quick Team Actions */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+                  <Link to="/team-details">
+                    <Edit className="h-5 w-5" />
+                    <span className="text-xs">Edit Details</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+                  <Link to="/team-roles">
+                    <UserCog className="h-5 w-5" />
+                    <span className="text-xs">Manage Roles</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+                  <Link to="/calendar">
+                    <Calendar className="h-5 w-5" />
+                    <span className="text-xs">Events</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+                  <Link to="/chat">
+                    <MessageSquare className="h-5 w-5" />
+                    <span className="text-xs">Chat</span>
+                  </Link>
+                </Button>
+              </div>
+
               {/* Public Page Link */}
               <Card className="p-6 bg-muted/50">
                 <h3 className="font-bold mb-3 flex items-center gap-2">
@@ -145,10 +189,10 @@ const Team = () => {
                     readOnly 
                     className="flex-1"
                   />
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={() => copyToClipboard("gameplan.app/thunder-cycling", "Public page link")}>
                     <Copy className="h-4 w-4" />
                   </Button>
-                  <Button variant="default">
+                  <Button variant="default" onClick={() => window.open("/public-event/thunder-cycling", "_blank")}>
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
@@ -176,38 +220,42 @@ const Team = () => {
         {/* Team Members */}
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
               <Users className="h-6 w-6 text-primary" />
               Team Members ({teamMembers.length})
             </h2>
-            <Button variant="hero">
-              <Mail className="h-4 w-4 mr-2" />
-              Invite Members
+            <Button variant="hero" asChild>
+              <Link to="/invite-members">
+                <Mail className="h-4 w-4 mr-2" />
+                Invite Members
+              </Link>
             </Button>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {teamMembers.map((member, index) => (
-              <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                        {member.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    {member.status === "online" && (
-                      <span className="absolute bottom-0 right-0 h-3 w-3 bg-accent rounded-full border-2 border-card" />
-                    )}
+              <Link key={index} to={`/profile/${index + 1}`}>
+                <Card className="p-4 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                          {member.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      {member.status === "online" && (
+                        <span className="absolute bottom-0 right-0 h-3 w-3 bg-accent rounded-full border-2 border-card" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold truncate">{member.name}</div>
+                      <Badge variant="secondary" className="text-xs">
+                        {member.role}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold truncate">{member.name}</div>
-                    <Badge variant="secondary" className="text-xs">
-                      {member.role}
-                    </Badge>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             ))}
           </div>
         </Card>
@@ -221,14 +269,17 @@ const Team = () => {
               Post your team page and upcoming events to social media with one click. 
               Grow your community and attract new members.
             </p>
-            <div className="flex justify-center gap-3">
-              <Button variant="hero">
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button variant="hero" onClick={() => toast({ title: "Coming soon!", description: "Instagram sharing will be available soon." })}>
+                <Instagram className="h-4 w-4 mr-2" />
                 Share on Instagram
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => toast({ title: "Coming soon!", description: "Facebook sharing will be available soon." })}>
+                <Facebook className="h-4 w-4 mr-2" />
                 Share on Facebook
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => copyToClipboard(window.location.href, "Team page link")}>
+                <Copy className="h-4 w-4 mr-2" />
                 Copy Link
               </Button>
             </div>

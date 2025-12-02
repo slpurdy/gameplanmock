@@ -10,10 +10,13 @@ import {
   Bell,
   Trophy,
   LogOut,
-  Settings
+  Settings,
+  UserCog,
+  Mail,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import TeamSwitcher from "@/components/TeamSwitcher";
 
 const Dashboard = () => {
   const upcomingEvents = [
@@ -40,10 +43,13 @@ const Dashboard = () => {
       <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">GamePlan</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/" className="flex items-center gap-2">
+                <Trophy className="h-8 w-8 text-primary" />
+                <span className="text-2xl font-bold hidden sm:inline">GamePlan</span>
+              </Link>
+              <TeamSwitcher />
+            </div>
             
             <nav className="hidden md:flex items-center gap-6">
               <Link to="/dashboard" className="font-medium text-primary">
@@ -192,21 +198,45 @@ const Dashboard = () => {
               </Link>
             </Button>
             <Button variant="outline" className="h-24 flex-col gap-2" asChild>
-              <Link to="/calendar">
+              <Link to="/calendar/create">
                 <Calendar className="h-6 w-6" />
                 New Event
               </Link>
             </Button>
             <Button variant="outline" className="h-24 flex-col gap-2" asChild>
-              <Link to="/team">
-                <Users className="h-6 w-6" />
+              <Link to="/invite-members">
+                <Mail className="h-6 w-6" />
                 Invite Members
+              </Link>
+            </Button>
+            <Button variant="outline" className="h-24 flex-col gap-2" asChild>
+              <Link to="/team-roles">
+                <UserCog className="h-6 w-6" />
+                Manage Roles
+              </Link>
+            </Button>
+            <Button variant="outline" className="h-24 flex-col gap-2" asChild>
+              <Link to="/team-details">
+                <Users className="h-6 w-6" />
+                Team Details
               </Link>
             </Button>
             <Button variant="outline" className="h-24 flex-col gap-2" asChild>
               <Link to="/team">
                 <Trophy className="h-6 w-6" />
                 Team Page
+              </Link>
+            </Button>
+            <Button variant="outline" className="h-24 flex-col gap-2" asChild>
+              <Link to="/create-team">
+                <Users className="h-6 w-6" />
+                Create Team
+              </Link>
+            </Button>
+            <Button variant="outline" className="h-24 flex-col gap-2" asChild>
+              <Link to="/my-dashboard">
+                <TrendingUp className="h-6 w-6" />
+                My Stats
               </Link>
             </Button>
           </div>
