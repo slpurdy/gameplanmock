@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import BackButton from "@/components/BackButton";
 import {
   Trophy,
   Bell,
@@ -269,10 +270,13 @@ const TeamRoles = () => {
       <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">GamePlan</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <BackButton />
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <Trophy className="h-8 w-8 text-primary" />
+                <span className="text-2xl font-bold">GamePlan</span>
+              </Link>
+            </div>
 
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="relative">

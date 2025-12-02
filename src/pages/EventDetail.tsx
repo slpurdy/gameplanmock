@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import BackButton from "@/components/BackButton";
 import { 
   Trophy, Bell, Settings, Calendar, Clock, MapPin, Users, 
   Check, X, HelpCircle, Share2, Edit, MessageSquare, Download, Loader2
@@ -219,10 +220,13 @@ const EventDetail = () => {
       <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">GamePlan</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <BackButton />
+              <Link to="/dashboard" className="flex items-center gap-2">
+                <Trophy className="h-8 w-8 text-primary" />
+                <span className="text-2xl font-bold">GamePlan</span>
+              </Link>
+            </div>
 
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="relative">
@@ -248,9 +252,6 @@ const EventDetail = () => {
         {/* Event Header */}
         <div className="flex flex-col md:flex-row justify-between items-start gap-4">
           <div>
-            <Link to="/calendar" className="text-sm text-muted-foreground hover:text-foreground mb-2 inline-block">
-              ← Back to Calendar
-            </Link>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">{event.title}</h1>
             <div className="flex flex-wrap gap-4 text-muted-foreground">
               <span className="flex items-center gap-2">
