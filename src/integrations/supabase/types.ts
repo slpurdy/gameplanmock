@@ -277,6 +277,9 @@ export type Database = {
     }
     Functions: {
       generate_invite_code: { Args: never; Returns: string }
+      is_team_admin: { Args: { check_team_id: string }; Returns: boolean }
+      is_team_member: { Args: { check_team_id: string }; Returns: boolean }
+      users_share_team: { Args: { other_user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
