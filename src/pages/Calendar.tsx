@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Calendar as CalendarIcon, 
   Trophy,
@@ -21,6 +22,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 const Calendar = () => {
+  const { toast } = useToast();
+  
+  const handleAction = (action: string) => {
+    toast({
+      title: action,
+      description: "This feature is coming soon!",
+    });
+  };
+
   const events = [
     { 
       title: "Weekend Practice", 
@@ -69,7 +79,7 @@ const Calendar = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => handleAction("Notifications")}>
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
               </Button>
@@ -142,78 +152,80 @@ const Calendar = () => {
           {/* Events List */}
           <div className="md:col-span-2 space-y-4">
             {events.map((event, index) => (
-              <Card key={index} className="p-6 hover:shadow-lg transition-all duration-300">
-                <div className="flex flex-col md:flex-row justify-between gap-4">
-                  <div className="flex-1 space-y-3">
-                    <div>
-                      <div className="flex items-start gap-3 mb-2">
-                        <CalendarIcon className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                        <div>
-                          <h3 className="text-xl font-bold">{event.title}</h3>
-                          <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <CalendarIcon className="h-4 w-4" />
-                              {event.date}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {event.time}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              {event.location}
-                            </span>
+              <Link key={index} to={`/event/${index + 1}`}>
+                <Card className="p-6 hover:shadow-lg transition-all duration-300">
+                  <div className="flex flex-col md:flex-row justify-between gap-4">
+                    <div className="flex-1 space-y-3">
+                      <div>
+                        <div className="flex items-start gap-3 mb-2">
+                          <CalendarIcon className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                          <div>
+                            <h3 className="text-xl font-bold">{event.title}</h3>
+                            <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <CalendarIcon className="h-4 w-4" />
+                                {event.date}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {event.time}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" />
+                                {event.location}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Check className="h-3 w-3" />
-                        {event.going} Going
-                      </Badge>
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        <HelpCircle className="h-3 w-3" />
-                        {event.maybe} Maybe
-                      </Badge>
-                      {event.notGoing > 0 && (
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <X className="h-3 w-3" />
-                          {event.notGoing} Can't Go
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <Check className="h-3 w-3" />
+                          {event.going} Going
                         </Badge>
-                      )}
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <HelpCircle className="h-3 w-3" />
+                          {event.maybe} Maybe
+                        </Badge>
+                        {event.notGoing > 0 && (
+                          <Badge variant="outline" className="flex items-center gap-1">
+                            <X className="h-3 w-3" />
+                            {event.notGoing} Can't Go
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex md:flex-col gap-2">
+                      <Button 
+                        variant={event.status === "going" ? "default" : "outline"}
+                        className="flex-1 md:flex-none"
+                        size="sm"
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        Going
+                      </Button>
+                      <Button 
+                        variant={event.status === "maybe" ? "default" : "outline"}
+                        className="flex-1 md:flex-none"
+                        size="sm"
+                      >
+                        <HelpCircle className="h-4 w-4 mr-1" />
+                        Maybe
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="flex-1 md:flex-none"
+                        size="sm"
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Can't Go
+                      </Button>
                     </div>
                   </div>
-
-                  <div className="flex md:flex-col gap-2">
-                    <Button 
-                      variant={event.status === "going" ? "default" : "outline"}
-                      className="flex-1 md:flex-none"
-                      size="sm"
-                    >
-                      <Check className="h-4 w-4 mr-1" />
-                      Going
-                    </Button>
-                    <Button 
-                      variant={event.status === "maybe" ? "default" : "outline"}
-                      className="flex-1 md:flex-none"
-                      size="sm"
-                    >
-                      <HelpCircle className="h-4 w-4 mr-1" />
-                      Maybe
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      className="flex-1 md:flex-none"
-                      size="sm"
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Can't Go
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             ))}
 
             {/* Create Public Event CTA */}
@@ -223,9 +235,11 @@ const Calendar = () => {
               <p className="text-muted-foreground mb-4">
                 Open registration to other teams and collect signup fees
               </p>
-              <Button variant="hero">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Public Event
+              <Button variant="hero" asChild>
+                <Link to="/calendar/create">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Public Event
+                </Link>
               </Button>
             </Card>
           </div>

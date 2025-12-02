@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link, useParams } from "react-router-dom";
 import BackButton from "@/components/BackButton";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Trophy, Bell, Settings, Mail, Calendar, MapPin, Star, Award, TrendingUp
 } from "lucide-react";
@@ -11,6 +12,14 @@ import { Separator } from "@/components/ui/separator";
 
 const Profile = () => {
   const { id } = useParams();
+  const { toast } = useToast();
+
+  const handleAction = (action: string) => {
+    toast({
+      title: action,
+      description: "This feature is coming soon!",
+    });
+  };
 
   const stats = [
     { label: "Events Attended", value: "42", icon: Calendar },
@@ -39,12 +48,14 @@ const Profile = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => handleAction("Notifications")}>
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
               </Button>
-              <Button variant="ghost" size="icon">
-                <Settings className="h-5 w-5" />
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/settings">
+                  <Settings className="h-5 w-5" />
+                </Link>
               </Button>
               <Avatar>
                 <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
@@ -79,11 +90,11 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Button variant="hero" className="w-full">
+                <Button variant="hero" className="w-full" onClick={() => handleAction("Send Message")}>
                   <Mail className="h-4 w-4 mr-2" />
                   Send Message
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => handleAction("View Full Profile")}>
                   View Full Profile
                 </Button>
               </div>
