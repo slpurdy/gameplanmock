@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import { 
   MessageSquare, 
   Calendar, 
@@ -19,6 +20,15 @@ import { Badge } from "@/components/ui/badge";
 import TeamSwitcher from "@/components/TeamSwitcher";
 
 const Dashboard = () => {
+  const { toast } = useToast();
+  
+  const handleAction = (action: string) => {
+    toast({
+      title: action,
+      description: "This feature is coming soon!",
+    });
+  };
+
   const upcomingEvents = [
     { title: "Weekend Practice", date: "Sat, Jan 20", attendees: 12, total: 15 },
     { title: "Championship Race", date: "Sun, Jan 28", attendees: 18, total: 20 },
@@ -70,7 +80,7 @@ const Dashboard = () => {
             </nav>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => handleAction("Notifications")}>
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
               </Button>
@@ -123,7 +133,7 @@ const Dashboard = () => {
             </div>
             <div className="space-y-4">
               {upcomingEvents.map((event, index) => (
-                <div key={index} className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                <Link key={index} to={`/event/${index + 1}`} className="block p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="font-semibold">{event.title}</h3>
@@ -134,9 +144,9 @@ const Dashboard = () => {
                     </Badge>
                   </div>
                   <Button variant="outline" size="sm" className="w-full mt-2">
-                    Manage RSVP
+                    View Details
                   </Button>
-                </div>
+                </Link>
               ))}
               <Button variant="hero" className="w-full" asChild>
                 <Link to="/calendar/create">
@@ -160,7 +170,7 @@ const Dashboard = () => {
             </div>
             <div className="space-y-4">
               {recentMessages.map((msg, index) => (
-                <div key={index} className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer">
+                <Link key={index} to="/chat" className="block p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer">
                   <div className="flex items-start gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback className="bg-primary/10 text-primary">
@@ -175,7 +185,7 @@ const Dashboard = () => {
                       <p className="text-sm text-muted-foreground truncate">{msg.message}</p>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
               <Button variant="default" className="w-full" asChild>
                 <Link to="/chat">
@@ -251,8 +261,10 @@ const Dashboard = () => {
                 Get unlimited members, custom branding, and advanced analytics
               </p>
             </div>
-            <Button variant="accent" size="lg">
-              Upgrade Now
+            <Button variant="accent" size="lg" asChild>
+              <Link to="/payments">
+                Upgrade Now
+              </Link>
             </Button>
           </div>
         </Card>

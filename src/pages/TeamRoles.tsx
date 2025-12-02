@@ -279,7 +279,7 @@ const TeamRoles = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => toast({ title: "Notifications", description: "Coming soon!" })}>
                 <Bell className="h-5 w-5" />
               </Button>
               <Button variant="ghost" size="icon" asChild>

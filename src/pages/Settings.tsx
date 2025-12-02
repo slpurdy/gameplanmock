@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import BackButton from "@/components/BackButton";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Trophy, Bell, Settings as SettingsIcon, Save, Upload, Shield, CreditCard, Users, Trash2
 } from "lucide-react";
@@ -14,6 +15,22 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Settings = () => {
+  const { toast } = useToast();
+
+  const handleSave = (section: string) => {
+    toast({
+      title: "Settings saved!",
+      description: `Your ${section} settings have been updated.`,
+    });
+  };
+
+  const handleAction = (action: string) => {
+    toast({
+      title: action,
+      description: "This feature is coming soon!",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
       {/* Header */}
@@ -29,7 +46,7 @@ const Settings = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => handleAction("Notifications")}>
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
               </Button>
@@ -69,7 +86,7 @@ const Settings = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="space-y-2">
-                    <Button variant="outline">
+                <Button variant="outline" onClick={() => handleAction("Upload Photo")}>
                       <Upload className="h-4 w-4 mr-2" />
                       Upload Photo
                     </Button>
@@ -107,7 +124,7 @@ const Settings = () => {
                   />
                 </div>
 
-                <Button variant="hero">
+                <Button variant="hero" onClick={() => handleSave("profile")}>
                   <Save className="h-4 w-4 mr-2" />
                   Save Changes
                 </Button>
@@ -162,7 +179,7 @@ const Settings = () => {
                   <Switch defaultChecked />
                 </div>
 
-                <Button variant="hero">
+                <Button variant="hero" onClick={() => handleSave("team")}>
                   <Save className="h-4 w-4 mr-2" />
                   Save Team Settings
                 </Button>
@@ -234,7 +251,7 @@ const Settings = () => {
                   <Switch />
                 </div>
 
-                <Button variant="hero">
+                <Button variant="hero" onClick={() => handleSave("notification")}>
                   <Save className="h-4 w-4 mr-2" />
                   Save Preferences
                 </Button>
@@ -257,11 +274,11 @@ const Settings = () => {
                         <div className="text-sm text-muted-foreground">Connected</div>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">Configure</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleAction("Configure Stripe")}>Configure</Button>
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => handleAction("Add Payment Method")}>
                   <CreditCard className="h-4 w-4 mr-2" />
                   Add Payment Method
                 </Button>
@@ -278,7 +295,7 @@ const Settings = () => {
                       </div>
                       <div className="text-right">
                         <div className="font-semibold">$29.00</div>
-                        <Button variant="ghost" size="sm">Download</Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleAction("Download Receipt")}>Download</Button>
                       </div>
                     </div>
                   </div>
@@ -308,7 +325,7 @@ const Settings = () => {
                   <Input id="confirmPassword" type="password" />
                 </div>
 
-                <Button variant="hero">
+                <Button variant="hero" onClick={() => handleSave("password")}>
                   <Shield className="h-4 w-4 mr-2" />
                   Update Password
                 </Button>
@@ -322,7 +339,7 @@ const Settings = () => {
                       Add an extra layer of security
                     </p>
                   </div>
-                  <Button variant="outline">Enable</Button>
+                  <Button variant="outline" onClick={() => handleAction("Enable 2FA")}>Enable</Button>
                 </div>
 
                 <Separator />
@@ -337,7 +354,7 @@ const Settings = () => {
                           Permanently delete your account and all data
                         </div>
                       </div>
-                      <Button variant="destructive">
+                      <Button variant="destructive" onClick={() => handleAction("Delete Account")}>
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
                       </Button>

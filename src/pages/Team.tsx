@@ -59,7 +59,7 @@ const Team = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => toast({ title: "Notifications", description: "This feature is coming soon!" })}>
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
               </Button>
@@ -82,7 +82,7 @@ const Team = () => {
           {/* Hero Banner */}
           <div className="h-48 bg-gradient-to-r from-primary via-accent to-secondary relative">
             <div className="absolute top-4 right-4">
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" onClick={() => toast({ title: "Edit Page", description: "This feature is coming soon!" })}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Page
               </Button>
