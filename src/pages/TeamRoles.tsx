@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,9 @@ import {
   Search,
   MoreVertical,
   Check,
+  Loader2,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -40,29 +40,31 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { format } from "date-fns";
 
 interface TeamMember {
   id: string;
-  name: string;
-  email: string;
-  role: "admin" | "moderator" | "member";
-  initials: string;
-  joinedAt: string;
+  user_id: string;
+  role: string;
+  joined_at: string;
+  profile: {
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 const TeamRoles = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [showRoleInfo, setShowRoleInfo] = useState(false);
-
-  const [members, setMembers] = useState<TeamMember[]>([
-    { id: "1", name: "Coach Alex", email: "alex@team.com", role: "admin", initials: "CA", joinedAt: "Jan 2024" },
-    { id: "2", name: "Sarah Martinez", email: "sarah@team.com", role: "moderator", initials: "SM", joinedAt: "Feb 2024" },
-    { id: "3", name: "Mike Thompson", email: "mike@team.com", role: "member", initials: "MT", joinedAt: "Feb 2024" },
-    { id: "4", name: "Jenny Kim", email: "jenny@team.com", role: "member", initials: "JK", joinedAt: "Mar 2024" },
-    { id: "5", name: "Tom Rodriguez", email: "tom@team.com", role: "member", initials: "TR", joinedAt: "Mar 2024" },
-    { id: "6", name: "Lisa Wong", email: "lisa@team.com", role: "moderator", initials: "LW", joinedAt: "Apr 2024" },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [teamId, setTeamId] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
   const roleConfig = {
     admin: { icon: Crown, color: "text-yellow-500", bg: "bg-yellow-500/10", label: "Admin" },
@@ -95,20 +97,142 @@ const TeamRoles = () => {
     ],
   };
 
-  const handleRoleChange = (memberId: string, newRole: "admin" | "moderator" | "member") => {
-    setMembers(
-      members.map((m) => (m.id === memberId ? { ...m, role: newRole } : m))
-    );
-    toast({
-      title: "Role updated",
-      description: "Member role has been successfully changed.",
-    });
+  useEffect(() => {
+    if (user) {
+      fetchTeamMembers();
+    }
+  }, [user]);
+
+  const fetchTeamMembers = async () => {
+    setLoading(true);
+    try {
+      // First get user's team
+      const { data: userTeam, error: teamError } = await supabase
+        .from("team_members")
+        .select("team_id, role")
+        .eq("user_id", user?.id)
+        .maybeSingle();
+
+      if (teamError) throw teamError;
+      if (!userTeam) {
+        setLoading(false);
+        return;
+      }
+
+      setTeamId(userTeam.team_id);
+      setCurrentUserRole(userTeam.role);
+
+      // Fetch all team members with profiles
+      const { data: membersData, error: membersError } = await supabase
+        .from("team_members")
+        .select(`
+          id,
+          user_id,
+          role,
+          joined_at,
+          profile:profiles(full_name, email, avatar_url)
+        `)
+        .eq("team_id", userTeam.team_id)
+        .order("joined_at", { ascending: true });
+
+      if (membersError) throw membersError;
+      setMembers(membersData as unknown as TeamMember[]);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to load team members",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRoleChange = async (memberId: string, newRole: string) => {
+    if (currentUserRole !== "admin") {
+      toast({
+        variant: "destructive",
+        title: "Permission denied",
+        description: "Only admins can change member roles",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("team_members")
+        .update({ role: newRole })
+        .eq("id", memberId);
+
+      if (error) throw error;
+
+      setMembers(
+        members.map((m) => (m.id === memberId ? { ...m, role: newRole } : m))
+      );
+      toast({
+        title: "Role updated",
+        description: "Member role has been successfully changed.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to update role",
+      });
+    }
+  };
+
+  const handleRemoveMember = async (memberId: string, memberUserId: string) => {
+    if (currentUserRole !== "admin") {
+      toast({
+        variant: "destructive",
+        title: "Permission denied",
+        description: "Only admins can remove members",
+      });
+      return;
+    }
+
+    if (memberUserId === user?.id) {
+      toast({
+        variant: "destructive",
+        title: "Cannot remove yourself",
+        description: "You cannot remove yourself from the team",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("team_members")
+        .delete()
+        .eq("id", memberId);
+
+      if (error) throw error;
+
+      setMembers(members.filter((m) => m.id !== memberId));
+      toast({
+        title: "Member removed",
+        description: "Member has been removed from the team.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to remove member",
+      });
+    }
+  };
+
+  const getInitials = (name: string | null, email: string | null) => {
+    if (name) return name.split(" ").map((n) => n[0]).join("").toUpperCase();
+    if (email) return email.substring(0, 2).toUpperCase();
+    return "??";
   };
 
   const filteredMembers = members.filter(
     (m) =>
-      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.email.toLowerCase().includes(searchQuery.toLowerCase())
+      (m.profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
+      (m.profile?.email?.toLowerCase().includes(searchQuery.toLowerCase()) || false)
   );
 
   const getRoleCounts = () => ({
@@ -118,6 +242,26 @@ const TeamRoles = () => {
   });
 
   const counts = getRoleCounts();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!teamId) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold mb-4">No team found</h1>
+        <p className="text-muted-foreground mb-4">You need to join or create a team first.</p>
+        <Button asChild>
+          <Link to="/create-team">Create a Team</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
@@ -140,7 +284,9 @@ const TeamRoles = () => {
                 </Link>
               </Button>
               <Avatar>
-                <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {getInitials(null, user?.email || null)}
+                </AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -205,25 +351,32 @@ const TeamRoles = () => {
           <ScrollArea className="h-[400px]">
             <div className="space-y-3">
               {filteredMembers.map((member) => {
-                const config = roleConfig[member.role];
+                const config = roleConfig[member.role as keyof typeof roleConfig] || roleConfig.member;
                 const Icon = config.icon;
+                const isCurrentUser = member.user_id === user?.id;
                 return (
                   <Card key={member.id} className="p-4">
                     <div className="flex items-center gap-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarFallback className="bg-primary/10">{member.initials}</AvatarFallback>
+                        <AvatarFallback className="bg-primary/10">
+                          {getInitials(member.profile?.full_name || null, member.profile?.email || null)}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold truncate">{member.name}</div>
-                        <div className="text-sm text-muted-foreground truncate">{member.email}</div>
-                        <div className="text-xs text-muted-foreground">Joined {member.joinedAt}</div>
+                        <div className="font-semibold truncate">
+                          {member.profile?.full_name || member.profile?.email || "Unknown"}
+                          {isCurrentUser && <span className="text-xs text-muted-foreground ml-2">(You)</span>}
+                        </div>
+                        <div className="text-sm text-muted-foreground truncate">{member.profile?.email}</div>
+                        <div className="text-xs text-muted-foreground">
+                          Joined {format(new Date(member.joined_at), "MMM yyyy")}
+                        </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <Select
                           value={member.role}
-                          onValueChange={(value: "admin" | "moderator" | "member") =>
-                            handleRoleChange(member.id, value)
-                          }
+                          onValueChange={(value) => handleRoleChange(member.id, value)}
+                          disabled={currentUserRole !== "admin"}
                         >
                           <SelectTrigger className="w-36">
                             <SelectValue>
@@ -254,17 +407,28 @@ const TeamRoles = () => {
                             </SelectItem>
                           </SelectContent>
                         </Select>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>View Profile</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">Remove Member</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {currentUserRole === "admin" && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem asChild>
+                                <Link to={`/profile/${member.user_id}`}>View Profile</Link>
+                              </DropdownMenuItem>
+                              {!isCurrentUser && (
+                                <DropdownMenuItem 
+                                  className="text-destructive"
+                                  onClick={() => handleRemoveMember(member.id, member.user_id)}
+                                >
+                                  Remove Member
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </div>
                     </div>
                   </Card>
