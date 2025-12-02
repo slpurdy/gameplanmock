@@ -8,9 +8,7 @@ import {
   DollarSign, 
   Users, 
   TrendingUp,
-  Bell,
   Trophy,
-  LogOut,
   Settings,
   UserCog,
   Mail,
@@ -18,6 +16,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import TeamSwitcher from "@/components/TeamSwitcher";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -80,17 +79,14 @@ const Dashboard = () => {
             </nav>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative" onClick={() => handleAction("Notifications")}>
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-secondary rounded-full" />
-              </Button>
-              <Button variant="ghost" size="icon" asChild>
+              <NotificationCenter />
+              <Button variant="ghost" size="icon" className="neon-border rounded-lg" asChild>
                 <Link to="/settings">
                   <Settings className="h-5 w-5" />
                 </Link>
               </Button>
-              <Avatar>
-                <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
+              <Avatar className="neon-border">
+                <AvatarFallback className="bg-primary text-primary-foreground font-display">JD</AvatarFallback>
               </Avatar>
             </div>
           </div>
